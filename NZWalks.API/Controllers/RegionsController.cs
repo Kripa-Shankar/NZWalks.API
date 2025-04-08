@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using NZWalks.API.Data;
+using NZWalks.API.Models.Domain;
 using NZWalks.API.Models.DTO;
 
 namespace NZWalks.API.Controllers
@@ -65,6 +66,38 @@ namespace NZWalks.API.Controllers
            
             //Return DTO back to client
             return Ok(regionDto);
+        }
+
+        //POST To create New region
+        //POST : https:localhost:port_number/api/regions
+        [HttpPost]
+        public IActionResult CreateRegion([FromBody] AddRegionRequestDto addRegionRequestDto)
+        {
+            //Map or Convert DTO to Domain Model
+            var regionDomainModel = new Region
+            {
+                Code = addRegionRequestDto.Code,
+                Name = addRegionRequestDto.Name,
+                RegionImageUrl = addRegionRequestDto.RegionImageUrl,
+            };
+            //Id will be created by Entity Framework
+
+            //Use Domain  Model to Create Region
+            dbContext.Regions.Add(regionDomainModel);
+            dbContext.SaveChanges();
+
+            //Map DomainModel to Dto
+
+            var regionDto = new RegionDto
+            {
+                Id=regionDomainModel.Id,
+                Code = regionDomainModel.Code,
+                Name = regionDomainModel.Name,
+                RegionImageUrl = regionDomainModel.RegionImageUrl,
+            };
+
+            //POST method don't send a ok response instead it send a CreatedAtAction()
+            return CreatedAtAction(nameof(GetRegionById), new { id = regionDto.Id }, regionDto);
         }
     }
 }
