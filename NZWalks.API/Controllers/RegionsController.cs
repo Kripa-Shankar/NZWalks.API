@@ -102,12 +102,12 @@ namespace NZWalks.API.Controllers
         //PUT To Update Region
         //PUT :https:localhost:port_number/api/regions/{id}
         [HttpPut]
-        [Route("{id}")]
-        public IActionResult UpdateRegion([FromRoute] Guid id,UpdateRequestRegionDto updateRequestRegionDto)
+        [Route("{id:Guid}")]
+        public IActionResult UpdateRegion([FromRoute] Guid id, UpdateRequestRegionDto updateRequestRegionDto)
         {
             //check if the region exist
-            var regionDomainModel =dbContext.Regions.FirstOrDefault(x=>x.Id == id);
-            if(regionDomainModel == null)
+            var regionDomainModel = dbContext.Regions.FirstOrDefault(x => x.Id == id);
+            if (regionDomainModel == null)
             {
                 return NotFound();
             }
@@ -131,6 +131,43 @@ namespace NZWalks.API.Controllers
             };
             return Ok(regionDto);
         }
-    }
+
+        //Delete a Region
+        //DELETE :https:localhost:port_number/api/regions/{id}
+        [HttpDelete]
+        [Route("{id:Guid}")]
+
+        public IActionResult DeleteRegion([FromRoute] Guid id)
+        {
+            {
+                //check if the region  exists
+                var regionDomainModel = dbContext.Regions.FirstOrDefault(x => x.Id == id);
+                if (regionDomainModel == null)
+                {
+                    return NotFound();
+                }
+
+                dbContext.Regions.Remove(regionDomainModel);
+                dbContext.SaveChanges();
+
+                //return Ok();
+
+                //optional you can also return the deleted data
+
+                //Map regionDomain model to DTO
+
+                var regionDto = new RegionDto
+                {
+                    Id = regionDomainModel.Id,
+                    Code = regionDomainModel.Code,
+                    Name = regionDomainModel.Name,
+                    RegionImageUrl = regionDomainModel.RegionImageUrl,
+
+                };
+                return Ok(regionDto);
+            }
+        }
+
+        }
 }
 
