@@ -98,6 +98,39 @@ namespace NZWalks.API.Controllers
             //POST method don't send a ok response instead it send a CreatedAtAction()
             return CreatedAtAction(nameof(GetRegionById), new { id = regionDto.Id }, regionDto);
         }
+
+        //PUT To Update Region
+        //PUT :https:localhost:port_number/api/regions/{id}
+        [HttpPut]
+        [Route("{id}")]
+        public IActionResult UpdateRegion([FromRoute] Guid id,UpdateRequestRegionDto updateRequestRegionDto)
+        {
+            //check if the region exist
+            var regionDomainModel =dbContext.Regions.FirstOrDefault(x=>x.Id == id);
+            if(regionDomainModel == null)
+            {
+                return NotFound();
+            }
+
+            //Map Dto to Domain Model
+            regionDomainModel.Code = updateRequestRegionDto.Code;
+            regionDomainModel.Name = updateRequestRegionDto.Name;
+            regionDomainModel.RegionImageUrl = updateRequestRegionDto.RegionImageUrl;
+
+            //After Update save the changes in dbContext
+            dbContext.SaveChanges();
+
+            //Map Domain Model to DTO
+
+            var regionDto = new RegionDto
+            {
+                Id = regionDomainModel.Id,
+                Code = regionDomainModel.Code,
+                Name = regionDomainModel.Name,
+                RegionImageUrl = regionDomainModel.RegionImageUrl,
+            };
+            return Ok(regionDto);
+        }
     }
 }
 
